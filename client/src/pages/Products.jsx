@@ -371,18 +371,25 @@ function Products() {
 
                                                         <td>
 
-                                                            <button
-                                                                className="delete-button"
-                                                                onClick={() =>
-                                                                    deleteProduct(
-                                                                        product.id
-                                                                    )
-                                                                }
-                                                            >
-                                                                🗑️ Delete
-                                                            </button>
+    <button
+        className="edit-button"
+        onClick={() =>
+            navigate(`/products/edit/${product.id}`)
+        }
+    >
+        ✏️ Edit
+    </button>
 
-                                                        </td>
+    <button
+        className="delete-button"
+        onClick={() =>
+            deleteProduct(product.id)
+        }
+    >
+        🗑️ Delete
+    </button>
+
+</td>
 
                                                     </tr>
 

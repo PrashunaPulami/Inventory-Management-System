@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import AddProduct from "./pages/AddProduct";
+import EditProduct from "./pages/EditProduct";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -52,6 +53,15 @@ function App() {
                 <AddProduct />
             </ProtectedRoute>
         }
+    />
+
+    <Route
+    path="/products/edit/:id"
+    element={
+        <ProtectedRoute>
+            <EditProduct />
+        </ProtectedRoute>
+         }
     />
 
 </Routes>
