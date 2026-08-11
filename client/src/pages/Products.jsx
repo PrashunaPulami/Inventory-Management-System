@@ -9,39 +9,21 @@ function Products() {
     const [suppliers, setSuppliers] = useState([]);
 
     const [search, setSearch] = useState("");
-    const [categoryFilter, setCategoryFilter] = useState("");
-    const [supplierFilter, setSupplierFilter] = useState("");
+    const [category, setCategory] = useState("");
+    const [supplier, setSupplier] = useState("");
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // Fetch products and suppliers
-    const fetchData = async () => {
+    const fetchProducts = async () => {
         try {
             setLoading(true);
-            setError("");
 
-            const [productsResponse, suppliersResponse] =
-                await Promise.all([
-                    api.get("/products"),
-                    api.get("/suppliers")
-                ]);
+            const response = await api.get("/products");
 
-            setProducts(productsResponse.data);
-            setSuppliers(suppliersResponse.data);
-
+            setProducts(response.data);
         } catch (error) {
             console.error(error);
-
-            if (error.response?.status === 401 ||
-                error.response?.status === 403) {
-
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-
-                navigate("/login");
-                return;
-            }
 
             setError(
                 error.response?.data?.message ||
@@ -52,27 +34,35 @@ function Products() {
         }
     };
 
+    const fetchSuppliers = async () => {
+        try {
+            const response = await api.get("/suppliers");
+
+            setSuppliers(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     useEffect(() => {
-        fetchData();
+        fetchProducts();
+        fetchSuppliers();
     }, []);
 
     // Delete product
-    const handleDelete = async (id) => {
-
-        const confirmed = window.confirm(
+    const deleteProduct = async (id) => {
+        const confirmDelete = window.confirm(
             "Are you sure you want to delete this product?"
         );
 
-        if (!confirmed) {
+        if (!confirmDelete) {
             return;
         }
 
         try {
             await api.delete(`/products/${id}`);
 
-            // Refresh product list
-            fetchData();
-
+            fetchProducts();
         } catch (error) {
             alert(
                 error.response?.data?.message ||
@@ -80,6 +70,13 @@ function Products() {
             );
         }
     };
+
+    // Get categories
+    const categories = [
+        ...new Set(
+            products.map((product) => product.category)
+        )
+    ];
 
     // Filter products
     const filteredProducts = products.filter((product) => {
@@ -90,12 +87,12 @@ function Products() {
                 .includes(search.toLowerCase());
 
         const matchesCategory =
-            categoryFilter === "" ||
-            product.category === categoryFilter;
+            category === "" ||
+            product.category === category;
 
         const matchesSupplier =
-            supplierFilter === "" ||
-            String(product.supplierId) === String(supplierFilter);
+            supplier === "" ||
+            String(product.supplierId) === String(supplier);
 
         return (
             matchesSearch &&
@@ -104,23 +101,17 @@ function Products() {
         );
     });
 
-    // Get unique categories
-    const categories = [
-        ...new Set(
-            products.map((product) => product.category)
-        )
-    ];
-
     return (
         <div className="products-page">
 
+            {/* Header */}
             <header className="page-header">
 
                 <div>
                     <h1>📦 Products</h1>
 
                     <p>
-                        Manage your inventory products
+                        Manage your inventory
                     </p>
                 </div>
 
@@ -128,14 +119,18 @@ function Products() {
 
                     <button
                         className="secondary-button"
-                        onClick={() => navigate("/dashboard")}
+                        onClick={() =>
+                            navigate("/dashboard")
+                        }
                     >
                         ← Dashboard
                     </button>
 
                     <button
                         className="primary-button"
-                        onClick={() => navigate("/products/add")}
+                        onClick={() =>
+                            navigate("/products/add")
+                        }
                     >
                         + Add Product
                     </button>
@@ -144,21 +139,21 @@ function Products() {
 
             </header>
 
+
             <main className="products-container">
 
                 {/* Search and filters */}
-
                 <section className="filters">
 
                     <div className="filter-group">
 
                         <label>
-                            Search
+                            Search Product
                         </label>
 
                         <input
                             type="text"
-                            placeholder="Search products..."
+                            placeholder="Search..."
                             value={search}
                             onChange={(e) =>
                                 setSearch(e.target.value)
@@ -167,6 +162,7 @@ function Products() {
 
                     </div>
 
+
                     <div className="filter-group">
 
                         <label>
@@ -174,27 +170,29 @@ function Products() {
                         </label>
 
                         <select
-                            value={categoryFilter}
+                            value={category}
                             onChange={(e) =>
-                                setCategoryFilter(e.target.value)
+                                setCategory(e.target.value)
                             }
                         >
+
                             <option value="">
                                 All Categories
                             </option>
 
-                            {categories.map((category) => (
+                            {categories.map((item) => (
                                 <option
-                                    key={category}
-                                    value={category}
+                                    key={item}
+                                    value={item}
                                 >
-                                    {category}
+                                    {item}
                                 </option>
                             ))}
 
                         </select>
 
                     </div>
+
 
                     <div className="filter-group">
 
@@ -203,9 +201,9 @@ function Products() {
                         </label>
 
                         <select
-                            value={supplierFilter}
+                            value={supplier}
                             onChange={(e) =>
-                                setSupplierFilter(e.target.value)
+                                setSupplier(e.target.value)
                             }
                         >
 
@@ -213,12 +211,12 @@ function Products() {
                                 All Suppliers
                             </option>
 
-                            {suppliers.map((supplier) => (
+                            {suppliers.map((item) => (
                                 <option
-                                    key={supplier.id}
-                                    value={supplier.id}
+                                    key={item.id}
+                                    value={item.id}
                                 >
-                                    {supplier.name}
+                                    {item.name}
                                 </option>
                             ))}
 
@@ -228,16 +226,16 @@ function Products() {
 
                 </section>
 
-                {/* Error */}
 
+                {/* Error */}
                 {error && (
                     <div className="error-message">
                         ❌ {error}
                     </div>
                 )}
 
-                {/* Loading */}
 
+                {/* Loading */}
                 {loading ? (
 
                     <div className="loading">
@@ -249,14 +247,15 @@ function Products() {
                     <section className="products-table-container">
 
                         <div className="table-info">
-                            <p>
-                                Showing{" "}
-                                <strong>
-                                    {filteredProducts.length}
-                                </strong>{" "}
-                                product(s)
-                            </p>
+
+                            Showing{" "}
+                            <strong>
+                                {filteredProducts.length}
+                            </strong>{" "}
+                            product(s)
+
                         </div>
+
 
                         <div className="table-wrapper">
 
@@ -275,106 +274,107 @@ function Products() {
 
                                 </thead>
 
+
                                 <tbody>
 
                                     {filteredProducts.length === 0 ? (
 
                                         <tr>
+
                                             <td
                                                 colSpan="6"
                                                 className="empty-message"
                                             >
                                                 No products found.
+
                                             </td>
+
                                         </tr>
 
                                     ) : (
 
-                                        filteredProducts.map((product) => {
+                                        filteredProducts.map(
+                                            (product) => {
 
-                                            const isLowStock =
-                                                Number(product.stockQuantity) < 5;
+                                                const lowStock =
+                                                    Number(
+                                                        product.stockQuantity
+                                                    ) < 5;
 
-                                            return (
-                                                <tr
-                                                    key={product.id}
-                                                    className={
-                                                        isLowStock
-                                                            ? "low-stock-row"
-                                                            : ""
-                                                    }
-                                                >
+                                                return (
 
-                                                    <td>
-                                                        <strong>
-                                                            {product.name}
-                                                        </strong>
+                                                    <tr
+                                                        key={product.id}
+                                                        className={
+                                                            lowStock
+                                                                ? "low-stock-row"
+                                                                : ""
+                                                        }
+                                                    >
 
-                                                        {product.description && (
-                                                            <small>
-                                                                {
-                                                                    product.description
-                                                                }
-                                                            </small>
-                                                        )}
-                                                    </td>
+                                                        <td>
 
-                                                    <td>
-                                                        {product.category}
-                                                    </td>
+                                                            <strong>
+                                                                {product.name}
+                                                            </strong>
 
-                                                    <td>
-                                                        {product.Supplier?.name ||
-                                                            "Unknown supplier"}
-                                                    </td>
-
-                                                    <td>
-                                                        ${Number(
-                                                            product.price
-                                                        ).toFixed(2)}
-                                                    </td>
-
-                                                    <td>
-
-                                                        <span
-                                                            className={
-                                                                isLowStock
-                                                                    ? "stock-badge low"
-                                                                    : "stock-badge"
-                                                            }
-                                                        >
-
-                                                            {product.stockQuantity}
-
-                                                            {isLowStock && (
-                                                                <span>
-                                                                    {" "}⚠️
-                                                                </span>
+                                                            {product.description && (
+                                                                <small>
+                                                                    {
+                                                                        product.description
+                                                                    }
+                                                                </small>
                                                             )}
 
-                                                        </span>
+                                                        </td>
 
-                                                    </td>
 
-                                                    <td>
+                                                        <td>
+                                                            {product.category}
+                                                        </td>
 
-                                                        <div className="action-buttons">
 
-                                                            <button
-                                                                className="edit-button"
-                                                                onClick={() =>
-                                                                    navigate(
-                                                                        `/products/edit/${product.id}`
-                                                                    )
+                                                        <td>
+                                                            {product.Supplier?.name ||
+                                                                "Unknown"}
+                                                        </td>
+
+
+                                                        <td>
+                                                            $
+                                                            {Number(
+                                                                product.price
+                                                            ).toFixed(2)}
+                                                        </td>
+
+
+                                                        <td>
+
+                                                            <span
+                                                                className={
+                                                                    lowStock
+                                                                        ? "stock-badge low"
+                                                                        : "stock-badge"
                                                                 }
                                                             >
-                                                                ✏️ Edit
-                                                            </button>
+
+                                                                {
+                                                                    product.stockQuantity
+                                                                }
+
+                                                                {lowStock && " ⚠️"}
+
+                                                            </span>
+
+                                                        </td>
+
+
+                                                        <td>
 
                                                             <button
                                                                 className="delete-button"
                                                                 onClick={() =>
-                                                                    handleDelete(
+                                                                    deleteProduct(
                                                                         product.id
                                                                     )
                                                                 }
@@ -382,13 +382,13 @@ function Products() {
                                                                 🗑️ Delete
                                                             </button>
 
-                                                        </div>
+                                                        </td>
 
-                                                    </td>
+                                                    </tr>
 
-                                                </tr>
-                                            );
-                                        })
+                                                );
+                                            }
+                                        )
 
                                     )}
 
