@@ -1,6 +1,7 @@
 const express = require("express");
 
 const authenticateToken = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
 const {
     getProducts,
@@ -19,9 +20,19 @@ router.get("/", getProducts);
 
 router.get("/:id", getProductById);
 
-router.post("/", createProduct);
+// Create product with image upload
+router.post(
+    "/",
+    upload.single("image"),
+    createProduct
+);
 
-router.put("/:id", updateProduct);
+// Update product with optional image upload
+router.put(
+    "/:id",
+    upload.single("image"),
+    updateProduct
+);
 
 router.delete("/:id", deleteProduct);
 

@@ -14,13 +14,16 @@ const getProducts = async (req, res) => {
         });
 
         res.status(200).json(products);
+
     } catch (error) {
         console.error(error);
+
         res.status(500).json({
             message: "Unable to retrieve products."
         });
     }
 };
+
 
 // GET one product
 const getProductById = async (req, res) => {
@@ -41,17 +44,21 @@ const getProductById = async (req, res) => {
         }
 
         res.status(200).json(product);
+
     } catch (error) {
         console.error(error);
+
         res.status(500).json({
             message: "Unable to retrieve product."
         });
     }
 };
 
+
 // CREATE product
 const createProduct = async (req, res) => {
     try {
+
         const {
             name,
             description,
@@ -61,26 +68,41 @@ const createProduct = async (req, res) => {
             supplierId
         } = req.body;
 
+
         // Validation
-        if (!name || !category || price === undefined || stockQuantity === undefined || !supplierId) {
+        if (
+            !name ||
+            !category ||
+            price === undefined ||
+            stockQuantity === undefined ||
+            !supplierId
+        ) {
             return res.status(400).json({
-                message: "Name, category, price, stock quantity and supplier are required."
+                message:
+                    "Name, category, price, stock quantity and supplier are required."
             });
         }
 
+
+        // Price validation
         if (Number(price) < 0) {
             return res.status(400).json({
                 message: "Price cannot be negative."
             });
         }
 
+
+        // Stock validation
         if (Number(stockQuantity) < 0) {
             return res.status(400).json({
                 message: "Stock quantity cannot be negative."
             });
         }
 
-        const supplier = await Supplier.findByPk(supplierId);
+
+        // Check supplier
+        const supplier =
+            await Supplier.findByPk(supplierId);
 
         if (!supplier) {
             return res.status(400).json({
@@ -88,37 +110,55 @@ const createProduct = async (req, res) => {
             });
         }
 
+
+        // Get uploaded image
+        const image = req.file
+            ? `/uploads/${req.file.filename}`
+            : null;
+
+
+        // Create product
         const product = await Product.create({
             name,
             description,
             category,
             price,
             stockQuantity,
-            supplierId
+            supplierId,
+            image
         });
+
 
         res.status(201).json({
             message: "Product created successfully.",
             product
         });
+
     } catch (error) {
+
         console.error(error);
+
         res.status(500).json({
             message: "Unable to create product."
         });
     }
 };
 
+
 // UPDATE product
 const updateProduct = async (req, res) => {
     try {
-        const product = await Product.findByPk(req.params.id);
+
+        const product =
+            await Product.findByPk(req.params.id);
+
 
         if (!product) {
             return res.status(404).json({
                 message: "Product not found."
             });
         }
+
 
         const {
             name,
@@ -129,25 +169,41 @@ const updateProduct = async (req, res) => {
             supplierId
         } = req.body;
 
-        if (!name || !category || price === undefined || stockQuantity === undefined || !supplierId) {
+
+        // Validation
+        if (
+            !name ||
+            !category ||
+            price === undefined ||
+            stockQuantity === undefined ||
+            !supplierId
+        ) {
             return res.status(400).json({
-                message: "Name, category, price, stock quantity and supplier are required."
+                message:
+                    "Name, category, price, stock quantity and supplier are required."
             });
         }
 
+
+        // Price validation
         if (Number(price) < 0) {
             return res.status(400).json({
                 message: "Price cannot be negative."
             });
         }
 
+
+        // Stock validation
         if (Number(stockQuantity) < 0) {
             return res.status(400).json({
                 message: "Stock quantity cannot be negative."
             });
         }
 
-        const supplier = await Supplier.findByPk(supplierId);
+
+        // Check supplier
+        const supplier =
+            await Supplier.findByPk(supplierId);
 
         if (!supplier) {
             return res.status(400).json({
@@ -155,31 +211,50 @@ const updateProduct = async (req, res) => {
             });
         }
 
+
+        // Keep existing image unless a new image is uploaded
+        let image = product.image;
+
+        if (req.file) {
+            image = `/uploads/${req.file.filename}`;
+        }
+
+
+        // Update product
         await product.update({
             name,
             description,
             category,
             price,
             stockQuantity,
-            supplierId
+            supplierId,
+            image
         });
+
 
         res.status(200).json({
             message: "Product updated successfully.",
             product
         });
+
     } catch (error) {
+
         console.error(error);
+
         res.status(500).json({
             message: "Unable to update product."
         });
     }
 };
 
+
 // DELETE product
 const deleteProduct = async (req, res) => {
     try {
-        const product = await Product.findByPk(req.params.id);
+
+        const product =
+            await Product.findByPk(req.params.id);
+
 
         if (!product) {
             return res.status(404).json({
@@ -187,18 +262,24 @@ const deleteProduct = async (req, res) => {
             });
         }
 
+
         await product.destroy();
+
 
         res.status(200).json({
             message: "Product deleted successfully."
         });
+
     } catch (error) {
+
         console.error(error);
+
         res.status(500).json({
             message: "Unable to delete product."
         });
     }
 };
+
 
 module.exports = {
     getProducts,

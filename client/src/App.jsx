@@ -8,6 +8,7 @@ import {
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
+import AddProduct from "./pages/AddProduct";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -16,40 +17,44 @@ function App() {
 
             <Routes>
 
-                <Route
-                    path="/login"
-                    element={<Login />}
-                />
+    <Route
+        path="/"
+        element={<Navigate to="/login" replace />}
+    />
 
-                <Route
-                    path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
+    <Route
+        path="/login"
+        element={<Login />}
+    />
 
-                <Route
-                    path="/products"
-                    element={
-                        <ProtectedRoute>
-                            <Products />
-                        </ProtectedRoute>
-                    }
-                />
+    <Route
+        path="/dashboard"
+        element={
+            <ProtectedRoute>
+                <Dashboard />
+            </ProtectedRoute>
+        }
+    />
 
-                <Route
-                    path="/"
-                    element={
-                        <Navigate
-                            to="/login"
-                            replace
-                        />
-                    }
-                />
+    <Route
+        path="/products"
+        element={
+            <ProtectedRoute>
+                <Products />
+            </ProtectedRoute>
+        }
+    />
 
-            </Routes>
+    <Route
+        path="/products/add"
+        element={
+            <ProtectedRoute>
+                <AddProduct />
+            </ProtectedRoute>
+        }
+    />
+
+</Routes>
 
         </BrowserRouter>
     );
