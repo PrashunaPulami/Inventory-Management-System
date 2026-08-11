@@ -362,3 +362,25 @@ button {
     object-fit: cover;
     border-radius: 12px;
 }
+
+/* Product Images */
+
+.product-table-image {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    border-radius: 10px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.no-product-image {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 28px;
+    margin-bottom: 6px;
+}

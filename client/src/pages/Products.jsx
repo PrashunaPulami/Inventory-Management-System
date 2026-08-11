@@ -15,9 +15,11 @@ function Products() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // Fetch products
     const fetchProducts = async () => {
         try {
             setLoading(true);
+            setError("");
 
             const response = await api.get("/products");
 
@@ -34,6 +36,7 @@ function Products() {
         }
     };
 
+    // Fetch suppliers
     const fetchSuppliers = async () => {
         try {
             const response = await api.get("/suppliers");
@@ -44,6 +47,7 @@ function Products() {
         }
     };
 
+    // Load products and suppliers
     useEffect(() => {
         fetchProducts();
         fetchSuppliers();
@@ -64,6 +68,8 @@ function Products() {
 
             fetchProducts();
         } catch (error) {
+            console.error(error);
+
             alert(
                 error.response?.data?.message ||
                 "Unable to delete product."
@@ -74,16 +80,17 @@ function Products() {
     // Get categories
     const categories = [
         ...new Set(
-            products.map((product) => product.category)
+            products
+                .map((product) => product.category)
+                .filter(Boolean)
         )
     ];
 
     // Filter products
     const filteredProducts = products.filter((product) => {
-
         const matchesSearch =
             product.name
-                .toLowerCase()
+                ?.toLowerCase()
                 .includes(search.toLowerCase());
 
         const matchesCategory =
@@ -142,9 +149,10 @@ function Products() {
 
             <main className="products-container">
 
-                {/* Search and filters */}
+                {/* Search and Filters */}
                 <section className="filters">
 
+                    {/* Search */}
                     <div className="filter-group">
 
                         <label>
@@ -163,6 +171,7 @@ function Products() {
                     </div>
 
 
+                    {/* Category Filter */}
                     <div className="filter-group">
 
                         <label>
@@ -194,6 +203,7 @@ function Products() {
                     </div>
 
 
+                    {/* Supplier Filter */}
                     <div className="filter-group">
 
                         <label>
@@ -227,7 +237,7 @@ function Products() {
                 </section>
 
 
-                {/* Error */}
+                {/* Error Message */}
                 {error && (
                     <div className="error-message">
                         ❌ {error}
@@ -246,6 +256,7 @@ function Products() {
 
                     <section className="products-table-container">
 
+                        {/* Table Information */}
                         <div className="table-info">
 
                             Showing{" "}
@@ -261,9 +272,11 @@ function Products() {
 
                             <table className="products-table">
 
+                                {/* Table Header */}
                                 <thead>
 
                                     <tr>
+                                        <th>Image</th>
                                         <th>Product</th>
                                         <th>Category</th>
                                         <th>Supplier</th>
@@ -275,6 +288,7 @@ function Products() {
                                 </thead>
 
 
+                                {/* Table Body */}
                                 <tbody>
 
                                     {filteredProducts.length === 0 ? (
@@ -282,11 +296,10 @@ function Products() {
                                         <tr>
 
                                             <td
-                                                colSpan="6"
+                                                colSpan="7"
                                                 className="empty-message"
                                             >
-                                                No products found.
-
+                                                📦 No products found.
                                             </td>
 
                                         </tr>
@@ -312,6 +325,29 @@ function Products() {
                                                         }
                                                     >
 
+                                                        {/* Product Image */}
+                                                        <td>
+
+                                                            {product.image ? (
+
+                                                                <img
+                                                                    src={`http://localhost:5000${product.image}`}
+                                                                    alt={product.name}
+                                                                    className="product-table-image"
+                                                                />
+
+                                                            ) : (
+
+                                                                <div className="no-product-image">
+                                                                    📦
+                                                                </div>
+
+                                                            )}
+
+                                                        </td>
+
+
+                                                        {/* Product Name */}
                                                         <td>
 
                                                             <strong>
@@ -329,17 +365,20 @@ function Products() {
                                                         </td>
 
 
+                                                        {/* Category */}
                                                         <td>
                                                             {product.category}
                                                         </td>
 
 
+                                                        {/* Supplier */}
                                                         <td>
                                                             {product.Supplier?.name ||
                                                                 "Unknown"}
                                                         </td>
 
 
+                                                        {/* Price */}
                                                         <td>
                                                             $
                                                             {Number(
@@ -348,6 +387,7 @@ function Products() {
                                                         </td>
 
 
+                                                        {/* Stock */}
                                                         <td>
 
                                                             <span
@@ -362,34 +402,45 @@ function Products() {
                                                                     product.stockQuantity
                                                                 }
 
-                                                                {lowStock && " ⚠️"}
+                                                                {lowStock &&
+                                                                    " ⚠️"}
 
                                                             </span>
 
                                                         </td>
 
 
+                                                        {/* Actions */}
                                                         <td>
 
-    <button
-        className="edit-button"
-        onClick={() =>
-            navigate(`/products/edit/${product.id}`)
-        }
-    >
-        ✏️ Edit
-    </button>
+                                                            <div className="action-buttons">
 
-    <button
-        className="delete-button"
-        onClick={() =>
-            deleteProduct(product.id)
-        }
-    >
-        🗑️ Delete
-    </button>
+                                                                <button
+                                                                    className="edit-button"
+                                                                    onClick={() =>
+                                                                        navigate(
+                                                                            `/products/edit/${product.id}`
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    ✏️ Edit
+                                                                </button>
 
-</td>
+
+                                                                <button
+                                                                    className="delete-button"
+                                                                    onClick={() =>
+                                                                        deleteProduct(
+                                                                            product.id
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    🗑️ Delete
+                                                                </button>
+
+                                                            </div>
+
+                                                        </td>
 
                                                     </tr>
 
