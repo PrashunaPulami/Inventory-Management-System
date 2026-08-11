@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# SQLite database
+server/*.db
+server/*.sqlite
+server/*.sqlite3
+
+# Uploaded files
+server/uploads/*
+
+# Build files
+client/dist/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
