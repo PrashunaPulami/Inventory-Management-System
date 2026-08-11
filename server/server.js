@@ -1,8 +1,11 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 
 const { sequelize } = require("./models");
 
+const authRoutes = require("./routes/authRoutes");
 const supplierRoutes = require("./routes/supplierRoutes");
 const productRoutes = require("./routes/productRoutes");
 
@@ -11,7 +14,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// API routes
+// Authentication
+app.use("/api/auth", authRoutes);
+
+// Protected API routes
 app.use("/api/suppliers", supplierRoutes);
 app.use("/api/products", productRoutes);
 
@@ -29,9 +35,14 @@ sequelize.sync()
         console.log("Database connected successfully.");
 
         app.listen(PORT, () => {
-            console.log(`Server running on http://localhost:${PORT}`);
+            console.log(
+                `Server running on http://localhost:${PORT}`
+            );
         });
     })
     .catch((error) => {
-        console.error("Unable to connect to database:", error);
+        console.error(
+            "Unable to connect to database:",
+            error
+        );
     });

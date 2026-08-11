@@ -1,5 +1,7 @@
 const express = require("express");
 
+const authenticateToken = require("../middleware/authMiddleware");
+
 const {
     getSuppliers,
     getSupplierById,
@@ -9,6 +11,9 @@ const {
 } = require("../controllers/supplierController");
 
 const router = express.Router();
+
+// All supplier routes require authentication
+router.use(authenticateToken);
 
 router.get("/", getSuppliers);
 
