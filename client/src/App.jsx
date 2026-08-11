@@ -10,6 +10,9 @@ import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
+import Suppliers from "./pages/Suppliers";
+import AddSupplier from "./pages/AddSupplier";
+import EditSupplier from "./pages/EditSupplier";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -62,6 +65,33 @@ function App() {
             <EditProduct />
         </ProtectedRoute>
          }
+    />
+
+    <Route
+    path="/suppliers"
+    element={
+        <ProtectedRoute>
+            <Suppliers />
+        </ProtectedRoute>
+        }
+    />
+
+    <Route
+    path="/suppliers/add"
+    element={
+        <ProtectedRoute>
+            <AddSupplier />
+        </ProtectedRoute>
+        }
+    />
+
+    <Route
+    path="/suppliers/edit/:id"
+    element={
+        <ProtectedRoute>
+            <EditSupplier />
+        </ProtectedRoute>
+        }
     />
 
 </Routes>

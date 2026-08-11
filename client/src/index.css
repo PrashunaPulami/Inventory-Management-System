@@ -384,3 +384,64 @@ button {
     font-size: 28px;
     margin-bottom: 6px;
 }
+
+/* Supplier Form */
+
+.form-card {
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-card h2 {
+    margin-bottom: 8px;
+}
+
+.form-description {
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #e88bb5;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.form-buttons button {
+    padding: 11px 18px;
+    border-radius: 9px;
+    font-weight: bold;
+}
+
+.form-buttons button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

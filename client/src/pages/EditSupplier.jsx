@@ -1,0 +1,259 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api from "../services/api";
+
+function EditSupplier() {
+    const navigate = useNavigate();
+    const { id } = useParams();
+
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        phone: ""
+    });
+
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
+
+    // Get supplier information
+    const fetchSupplier = async () => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const response = await api.get(`/suppliers/${id}`);
+
+            const supplier = response.data;
+
+            setFormData({
+                name: supplier.name || "",
+                email: supplier.email || "",
+                phone: supplier.phone || ""
+            });
+        } catch (error) {
+            console.error(error);
+
+            setError(
+                error.response?.data?.message ||
+                "Unable to load supplier."
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchSupplier();
+    }, [id]);
+
+    // Handle input changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        setFormData((previousData) => ({
+            ...previousData,
+            [name]: value
+        }));
+    };
+
+    // Update supplier
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        setError("");
+
+        // Validation
+        if (!formData.name.trim()) {
+            setError("Supplier name is required.");
+            return;
+        }
+
+        if (!formData.email.trim()) {
+            setError("Email is required.");
+            return;
+        }
+
+        if (!formData.phone.trim()) {
+            setError("Phone number is required.");
+            return;
+        }
+
+        try {
+            setSaving(true);
+
+            await api.put(`/suppliers/${id}`, {
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                phone: formData.phone.trim()
+            });
+
+            alert("Supplier updated successfully!");
+
+            navigate("/suppliers");
+        } catch (error) {
+            console.error(error);
+
+            setError(
+                error.response?.data?.message ||
+                "Unable to update supplier."
+            );
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Loading screen
+    if (loading) {
+        return (
+            <div className="products-page">
+                <div className="loading">
+                    Loading supplier...
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="products-page">
+
+            {/* Header */}
+            <header className="page-header">
+
+                <div>
+                    <h1>✏️ Edit Supplier</h1>
+
+                    <p>
+                        Update supplier information
+                    </p>
+                </div>
+
+                <button
+                    className="secondary-button"
+                    onClick={() =>
+                        navigate("/suppliers")
+                    }
+                >
+                    ← Back to Suppliers
+                </button>
+
+            </header>
+
+
+            {/* Form */}
+            <main className="products-container">
+
+                <section className="form-card">
+
+                    <h2>
+                        Supplier Information
+                    </h2>
+
+                    <p className="form-description">
+                        Update the details of this supplier.
+                    </p>
+
+
+                    {/* Error */}
+                    {error && (
+                        <div className="error-message">
+                            ❌ {error}
+                        </div>
+                    )}
+
+
+                    <form onSubmit={handleSubmit}>
+
+                        {/* Supplier Name */}
+                        <div className="form-group">
+
+                            <label htmlFor="name">
+                                Supplier Name *
+                            </label>
+
+                            <input
+                                id="name"
+                                name="name"
+                                type="text"
+                                placeholder="Enter supplier name"
+                                value={formData.name}
+                                onChange={handleChange}
+                            />
+
+                        </div>
+
+
+                        {/* Email */}
+                        <div className="form-group">
+
+                            <label htmlFor="email">
+                                Email *
+                            </label>
+
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                placeholder="supplier@example.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                            />
+
+                        </div>
+
+
+                        {/* Phone */}
+                        <div className="form-group">
+
+                            <label htmlFor="phone">
+                                Phone Number *
+                            </label>
+
+                            <input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                placeholder="Enter phone number"
+                                value={formData.phone}
+                                onChange={handleChange}
+                            />
+
+                        </div>
+
+
+                        {/* Buttons */}
+                        <div className="form-buttons">
+
+                            <button
+                                type="button"
+                                className="secondary-button"
+                                onClick={() =>
+                                    navigate("/suppliers")
+                                }
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                className="primary-button"
+                                disabled={saving}
+                            >
+                                {saving
+                                    ? "Saving..."
+                                    : "💾 Save Changes"}
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+            </main>
+
+        </div>
+    );
+}
+
+export default EditSupplier;
