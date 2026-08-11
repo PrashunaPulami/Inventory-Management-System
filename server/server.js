@@ -13,11 +13,13 @@ const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
+// Serve uploaded images
 app.use(
     "/uploads",
     express.static(path.join(__dirname, "uploads"))
 );
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -35,16 +37,17 @@ app.get("/", (req, res) => {
     });
 });
 
+// Use hosting provider's PORT or 5000 locally
 const PORT = process.env.PORT || 5000;
 
-sequelize.sync()
+// Connect database and start server
+sequelize
+    .sync()
     .then(() => {
         console.log("Database connected successfully.");
 
-        app.listen(PORT, () => {
-            console.log(
-                `Server running on http://localhost:${PORT}`
-            );
+        app.listen(PORT, "0.0.0.0", () => {
+            console.log(`Server running on port ${PORT}`);
         });
     })
     .catch((error) => {
